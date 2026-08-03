@@ -10,6 +10,7 @@
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
@@ -143,12 +144,19 @@ function EchoUI:CreateWindow(config)
 	-- LOADING SCREEN
 	-- ========================================================
 	if loadingEnabled then
+		local BlurEffect = make("BlurEffect", {
+			Name = "EchoUI_LoadingBlur",
+			Size = 0,
+			Parent = Lighting,
+		})
+		tween(BlurEffect, { Size = 24 }, loadingTime * 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
 		local LoadFrame = make("Frame", {
 			Name = "LoadingScreen",
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0, 0, 0, 0),
 			BackgroundColor3 = Color3.new(0, 0, 0),
-			BackgroundTransparency = 0.45,
+			BackgroundTransparency = 0.25,
 			BorderSizePixel = 0,
 			ZIndex = 50,
 			Parent = ScreenGui,
@@ -208,8 +216,10 @@ function EchoUI:CreateWindow(config)
 			tween(SubLabel, { TextTransparency = 1 }, 0.35)
 			tween(BarTrack, { BackgroundTransparency = 1 }, 0.35)
 			tween(BarFill, { BackgroundTransparency = 1 }, 0.35)
+			tween(BlurEffect, { Size = 0 }, 0.35)
 			task.wait(0.35)
 			LoadFrame:Destroy()
+			BlurEffect:Destroy()
 			Main.Visible = true
 			Main.BackgroundTransparency = 1
 			tween(Main, { BackgroundTransparency = 0 }, 0.2)
