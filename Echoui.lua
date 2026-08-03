@@ -156,7 +156,7 @@ function EchoUI:CreateWindow(config)
 			Size = UDim2.new(1, 0, 1, 0),
 			Position = UDim2.new(0, 0, 0, 0),
 			BackgroundColor3 = Color3.new(0, 0, 0),
-			BackgroundTransparency = 0.25,
+			BackgroundTransparency = 0.45,
 			BorderSizePixel = 0,
 			ZIndex = 50,
 			Parent = ScreenGui,
