@@ -112,7 +112,7 @@ function EchoUI:CreateWindow(config)
 	if loadingEnabled == nil then loadingEnabled = true end
 	local loadingTitle = config.LoadingTitle or title
 	local loadingSubtitle = config.LoadingSubtitle or subtitle
-	local loadingTime = config.LoadingTime or 1.4
+	local loadingTime = config.LoadingTime or 3.5
 
 	-- cleanup any previous instance with same name
 	local existing = PlayerGui:FindFirstChild("EchoUI_" .. title)
