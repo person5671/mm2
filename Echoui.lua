@@ -122,6 +122,7 @@ function EchoUI:CreateWindow(config)
 		Name = "EchoUI_" .. title,
 		ResetOnSpawn = false,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		IgnoreGuiInset = true,
 		Parent = PlayerGui,
 	})
 
