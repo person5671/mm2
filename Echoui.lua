@@ -17,6 +17,8 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local EchoUI = {}
 EchoUI.__index = EchoUI
 
+print("[EchoUI] Loaded version: v1.2-loadingscreen-fix")
+
 -- ============================================================
 -- THEME
 -- ============================================================
