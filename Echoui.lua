@@ -142,71 +142,70 @@ function EchoUI:CreateWindow(config)
 	if loadingEnabled then
 		local LoadFrame = make("Frame", {
 			Name = "LoadingScreen",
-			Size = size,
-			Position = UDim2.new(0.5, -size.X.Offset / 2, 0.5, -size.Y.Offset / 2),
-			BackgroundColor3 = Theme.Background,
+			Size = UDim2.new(1, 0, 1, 0),
+			Position = UDim2.new(0, 0, 0, 0),
+			BackgroundColor3 = Color3.new(0, 0, 0),
+			BackgroundTransparency = 0.45,
+			BorderSizePixel = 0,
+			ZIndex = 50,
 			Parent = ScreenGui,
 		})
-		corner(LoadFrame, 10)
-		stroke(LoadFrame, Theme.Border, 1)
 
 		local NameLabel = make("TextLabel", {
 			Text = loadingTitle,
 			Font = Enum.Font.GothamBold,
-			TextSize = 20,
-			TextColor3 = Theme.Text,
+			TextSize = 24,
+			TextColor3 = Color3.new(1, 1, 1),
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, -40, 0, 26),
-			Position = UDim2.new(0, 20, 0.5, -40),
+			Size = UDim2.new(0, 400, 0, 30),
+			Position = UDim2.new(0.5, -200, 0.5, -34),
 			TextXAlignment = Enum.TextXAlignment.Center,
+			ZIndex = 51,
 			Parent = LoadFrame,
 		})
 
-		make("TextLabel", {
+		local SubLabel = make("TextLabel", {
 			Text = loadingSubtitle,
 			Font = Enum.Font.Gotham,
-			TextSize = 12,
-			TextColor3 = Theme.SubText,
+			TextSize = 13,
+			TextColor3 = Color3.fromRGB(230, 230, 230),
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, -40, 0, 18),
-			Position = UDim2.new(0, 20, 0.5, -14),
+			Size = UDim2.new(0, 400, 0, 18),
+			Position = UDim2.new(0.5, -200, 0.5, -2),
 			TextXAlignment = Enum.TextXAlignment.Center,
+			ZIndex = 51,
 			Parent = LoadFrame,
 		})
 
 		local BarTrack = make("Frame", {
-			Size = UDim2.new(1, -80, 0, 6),
-			Position = UDim2.new(0, 40, 0.5, 16),
-			BackgroundColor3 = Theme.SurfaceLight,
+			Size = UDim2.new(0, 300, 0, 5),
+			Position = UDim2.new(0.5, -150, 0.5, 24),
+			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+			BackgroundTransparency = 0.8,
+			BorderSizePixel = 0,
+			ZIndex = 51,
 			Parent = LoadFrame,
 		})
 		corner(BarTrack, 3)
 
 		local BarFill = make("Frame", {
 			Size = UDim2.new(0, 0, 1, 0),
-			BackgroundColor3 = Theme.Accent,
+			BackgroundColor3 = Color3.new(1, 1, 1),
+			BorderSizePixel = 0,
+			ZIndex = 52,
 			Parent = BarTrack,
 		})
 		corner(BarFill, 3)
 
-		-- subtle gradient on the fill so it doesn't look flat
-		make("UIGradient", {
-			Color = ColorSequence.new(Theme.Accent, Theme.AccentAlt),
-			Parent = BarFill,
-		})
-
 		tween(BarFill, { Size = UDim2.new(1, 0, 1, 0) }, loadingTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
 		task.delay(loadingTime, function()
-			tween(LoadFrame, { BackgroundTransparency = 1 }, 0.3)
-			for _, child in ipairs(LoadFrame:GetDescendants()) do
-				if child:IsA("TextLabel") then
-					tween(child, { TextTransparency = 1 }, 0.3)
-				elseif child:IsA("Frame") or child:IsA("UICorner") then
-					pcall(function() tween(child, { BackgroundTransparency = 1 }, 0.3) end)
-				end
-			end
-			task.wait(0.3)
+			tween(LoadFrame, { BackgroundTransparency = 1 }, 0.35)
+			tween(NameLabel, { TextTransparency = 1 }, 0.35)
+			tween(SubLabel, { TextTransparency = 1 }, 0.35)
+			tween(BarTrack, { BackgroundTransparency = 1 }, 0.35)
+			tween(BarFill, { BackgroundTransparency = 1 }, 0.35)
+			task.wait(0.35)
 			LoadFrame:Destroy()
 			Main.Visible = true
 			Main.BackgroundTransparency = 1
