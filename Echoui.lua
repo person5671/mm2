@@ -331,12 +331,9 @@ end
 -- ============================================================
 -- TAB
 -- ============================================================
-function EchoUI:CreateTab(name)
+function EchoUI:CreateTab(name, icon)
 	local TabButton = make("TextButton", {
-		Text = name,
-		Font = Enum.Font.Gotham,
-		TextSize = 13,
-		TextColor3 = Theme.SubText,
+		Text = "",
 		BackgroundColor3 = Theme.SurfaceLight,
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 0, 0, 32),
@@ -344,6 +341,32 @@ function EchoUI:CreateTab(name)
 		Parent = self.TabBar,
 	})
 	corner(TabButton, 6)
+
+	local IconImage
+	local labelXOffset = 12
+	if icon then
+		IconImage = make("ImageLabel", {
+			Image = icon,
+			BackgroundTransparency = 1,
+			ImageColor3 = Theme.SubText,
+			Size = UDim2.new(0, 16, 0, 16),
+			Position = UDim2.new(0, 10, 0.5, -8),
+			Parent = TabButton,
+		})
+		labelXOffset = 34
+	end
+
+	local TabLabel = make("TextLabel", {
+		Text = name,
+		Font = Enum.Font.Gotham,
+		TextSize = 13,
+		TextColor3 = Theme.SubText,
+		BackgroundTransparency = 1,
+		Position = UDim2.new(0, labelXOffset, 0, 0),
+		Size = UDim2.new(1, -labelXOffset - 8, 1, 0),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = TabButton,
+	})
 
 	local Page = make("ScrollingFrame", {
 		Name = name .. "Page",
@@ -373,14 +396,25 @@ function EchoUI:CreateTab(name)
 	local function activate()
 		for _, t in ipairs(self.Tabs) do
 			t.Page.Visible = false
-			tween(t.Button, { BackgroundTransparency = 1, TextColor3 = Theme.SubText }, 0.15)
+			tween(t.Button, { BackgroundTransparency = 1 }, 0.15)
+			tween(t.Label, { TextColor3 = Theme.SubText }, 0.15)
+			if t.Icon then
+				tween(t.Icon, { ImageColor3 = Theme.SubText }, 0.15)
+			end
 		end
 		Page.Visible = true
-		tween(TabButton, { BackgroundTransparency = 0, TextColor3 = Theme.Text }, 0.15)
+		tween(TabButton, { BackgroundTransparency = 0 }, 0.15)
+		tween(TabLabel, { TextColor3 = Theme.Text }, 0.15)
+		if IconImage then
+			tween(IconImage, { ImageColor3 = Theme.AccentAlt }, 0.15)
+		end
 		self.ActiveTab = Tab
 	end
 
 	TabButton.MouseButton1Click:Connect(activate)
+
+	Tab.Label = TabLabel
+	Tab.Icon = IconImage
 
 	table.insert(self.Tabs, Tab)
 	if #self.Tabs == 1 then activate() end
