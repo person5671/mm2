@@ -295,6 +295,69 @@ function EchoUI:CreateWindow(config)
 		BackgroundColor3 = Theme.Surface,
 		Parent = Main,
 	})
+
+	-- Player profile header
+	local ProfileHeader = make("Frame", {
+		Name = "ProfileHeader",
+		Size = UDim2.new(1, 0, 0, 56),
+		BackgroundTransparency = 1,
+		LayoutOrder = -1,
+		Parent = TabBar,
+	})
+
+	local AvatarImage = make("ImageLabel", {
+		Size = UDim2.new(0, 36, 0, 36),
+		Position = UDim2.new(0, 8, 0, 10),
+		BackgroundColor3 = Theme.SurfaceLight,
+		Parent = ProfileHeader,
+	})
+	corner(AvatarImage, 18)
+	stroke(AvatarImage, Theme.Border, 1)
+
+	local ok, content = pcall(function()
+		return Players:GetUserThumbnailAsync(
+			LocalPlayer.UserId,
+			Enum.ThumbnailType.HeadShot,
+			Enum.ThumbnailSize.Size100x100
+		)
+	end)
+	if ok and content then
+		AvatarImage.Image = content
+	end
+
+	make("TextLabel", {
+		Text = LocalPlayer.DisplayName,
+		Font = Enum.Font.GothamBold,
+		TextSize = 13,
+		TextColor3 = Theme.Text,
+		BackgroundTransparency = 1,
+		Position = UDim2.new(0, 52, 0, 12),
+		Size = UDim2.new(1, -60, 0, 16),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		Parent = ProfileHeader,
+	})
+
+	make("TextLabel", {
+		Text = "@" .. LocalPlayer.Name,
+		Font = Enum.Font.Gotham,
+		TextSize = 11,
+		TextColor3 = Theme.SubText,
+		BackgroundTransparency = 1,
+		Position = UDim2.new(0, 52, 0, 28),
+		Size = UDim2.new(1, -60, 0, 14),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		Parent = ProfileHeader,
+	})
+
+	make("Frame", {
+		Size = UDim2.new(1, -16, 0, 1),
+		Position = UDim2.new(0, 8, 0, 54),
+		BackgroundColor3 = Theme.Border,
+		BorderSizePixel = 0,
+		Parent = ProfileHeader,
+	})
 	local TabList = make("UIListLayout", {
 		Padding = UDim.new(0, 4),
 		SortOrder = Enum.SortOrder.LayoutOrder,
@@ -346,13 +409,24 @@ function EchoUI:CreateTab(name, icon)
 	local labelXOffset = 12
 	if icon then
 		IconImage = make("ImageLabel", {
-			Image = icon,
 			BackgroundTransparency = 1,
 			ImageColor3 = Theme.SubText,
 			Size = UDim2.new(0, 16, 0, 16),
 			Position = UDim2.new(0, 10, 0.5, -8),
 			Parent = TabButton,
 		})
+
+		if type(icon) == "table" then
+			-- sprite-sheet style icon, e.g. from lucide-roblox / icons.rest
+			-- icon = { Id = "rbxassetid://123", Offset = Vector2.new(x, y), Size = Vector2.new(w, h) }
+			IconImage.Image = icon.Id
+			if icon.Offset then IconImage.ImageRectOffset = icon.Offset end
+			if icon.Size then IconImage.ImageRectSize = icon.Size end
+		else
+			-- plain rbxassetid string
+			IconImage.Image = icon
+		end
+
 		labelXOffset = 34
 	end
 
