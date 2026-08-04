@@ -110,7 +110,7 @@ function EchoUI:CreateWindow(config)
 	config = config or {}
 	local title = config.Title or "Echo UI"
 	local subtitle = config.Subtitle or ""
-	local size = config.Size or UDim2.fromOffset(520, 360)
+	local size = config.Size or UDim2.fromOffset(720, 460)
 	local loadingEnabled = config.LoadingEnabled
 	if loadingEnabled == nil then loadingEnabled = true end
 	local loadingTitle = config.LoadingTitle or title
@@ -139,6 +139,11 @@ function EchoUI:CreateWindow(config)
 	})
 	corner(Main, 10)
 	stroke(Main, Theme.Border, 1)
+
+	local Scale = make("UIScale", {
+		Scale = 1,
+		Parent = Main,
+	})
 
 	-- ========================================================
 	-- LOADING SCREEN
@@ -296,13 +301,21 @@ function EchoUI:CreateWindow(config)
 		Parent = Main,
 	})
 
-	-- Player profile header
+	-- Player profile footer (bottom of sidebar)
 	local ProfileHeader = make("Frame", {
-		Name = "ProfileHeader",
+		Name = "ProfileFooter",
 		Size = UDim2.new(1, 0, 0, 56),
+		Position = UDim2.new(0, 0, 1, -56),
 		BackgroundTransparency = 1,
-		LayoutOrder = -1,
 		Parent = TabBar,
+	})
+
+	make("Frame", {
+		Size = UDim2.new(1, -16, 0, 1),
+		Position = UDim2.new(0, 8, 0, 0),
+		BackgroundColor3 = Theme.Border,
+		BorderSizePixel = 0,
+		Parent = ProfileHeader,
 	})
 
 	local AvatarImage = make("ImageLabel", {
@@ -350,14 +363,6 @@ function EchoUI:CreateWindow(config)
 		TextTruncate = Enum.TextTruncate.AtEnd,
 		Parent = ProfileHeader,
 	})
-
-	make("Frame", {
-		Size = UDim2.new(1, -16, 0, 1),
-		Position = UDim2.new(0, 8, 0, 54),
-		BackgroundColor3 = Theme.Border,
-		BorderSizePixel = 0,
-		Parent = ProfileHeader,
-	})
 	local TabList = make("UIListLayout", {
 		Padding = UDim.new(0, 4),
 		SortOrder = Enum.SortOrder.LayoutOrder,
@@ -367,6 +372,7 @@ function EchoUI:CreateWindow(config)
 		PaddingTop = UDim.new(0, 10),
 		PaddingLeft = UDim.new(0, 8),
 		PaddingRight = UDim.new(0, 8),
+		PaddingBottom = UDim.new(0, 64),
 		Parent = TabBar,
 	})
 
@@ -382,11 +388,23 @@ function EchoUI:CreateWindow(config)
 	local Window = setmetatable({
 		ScreenGui = ScreenGui,
 		Main = Main,
+		Scale = Scale,
 		TabBar = TabBar,
 		ContentArea = ContentArea,
 		Tabs = {},
 		ActiveTab = nil,
 	}, EchoUI)
+
+	-- percent: 50 to 200 (e.g. 100 = normal size, 150 = 150%)
+	function Window:SetScale(percent)
+		percent = math.clamp(percent, 50, 200)
+		tween(self.Scale, { Scale = percent / 100 }, 0.15)
+		return percent
+	end
+
+	function Window:GetScale()
+		return self.Scale.Scale * 100
+	end
 
 	return Window
 end
