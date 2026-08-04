@@ -18,7 +18,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local EchoUI = {}
 EchoUI.__index = EchoUI
 
-print("[EchoUI] Loaded version: v1.3-profile-minimize-keybind")
+print("[EchoUI] Loaded version: v1.4-togglekey-fix")
 
 -- ============================================================
 -- THEME
@@ -517,7 +517,7 @@ function EchoUI:CreateWindow(config)
 	end)
 
 	UserInputService.InputBegan:Connect(function(input, processed)
-		if processed then return end
+		if UserInputService:GetFocusedTextBox() then return end
 		if input.KeyCode == Window.ToggleKey then
 			Window:ToggleMinimize()
 		end
