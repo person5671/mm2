@@ -290,6 +290,19 @@ function EchoUI:CreateWindow(config)
 	CloseBtn.MouseEnter:Connect(function() tween(CloseBtn, { TextColor3 = Theme.Danger }, 0.15) end)
 	CloseBtn.MouseLeave:Connect(function() tween(CloseBtn, { TextColor3 = Theme.SubText }, 0.15) end)
 
+	local MinimizeBtn = make("TextButton", {
+		Text = "–",
+		Font = Enum.Font.GothamBold,
+		TextSize = 20,
+		TextColor3 = Theme.SubText,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, 32, 0, 32),
+		Position = UDim2.new(1, -70, 0, 6),
+		Parent = TopBar,
+	})
+	MinimizeBtn.MouseEnter:Connect(function() tween(MinimizeBtn, { TextColor3 = Theme.Text }, 0.15) end)
+	MinimizeBtn.MouseLeave:Connect(function() tween(MinimizeBtn, { TextColor3 = Theme.SubText }, 0.15) end)
+
 	makeDraggable(Main, TopBar)
 
 	-- Tab bar (left column)
@@ -301,13 +314,14 @@ function EchoUI:CreateWindow(config)
 		Parent = Main,
 	})
 
-	-- Player profile footer (bottom of sidebar)
-	local ProfileHeader = make("Frame", {
+	-- Player profile footer (bottom of sidebar) - parented to Main directly,
+	-- NOT to TabBar, so the tab UIListLayout can't reposition it
+	local ProfileFooter = make("Frame", {
 		Name = "ProfileFooter",
-		Size = UDim2.new(1, 0, 0, 56),
+		Size = UDim2.new(0, 130, 0, 56),
 		Position = UDim2.new(0, 0, 1, -56),
-		BackgroundTransparency = 1,
-		Parent = TabBar,
+		BackgroundColor3 = Theme.Surface,
+		Parent = Main,
 	})
 
 	make("Frame", {
@@ -315,14 +329,14 @@ function EchoUI:CreateWindow(config)
 		Position = UDim2.new(0, 8, 0, 0),
 		BackgroundColor3 = Theme.Border,
 		BorderSizePixel = 0,
-		Parent = ProfileHeader,
+		Parent = ProfileFooter,
 	})
 
 	local AvatarImage = make("ImageLabel", {
 		Size = UDim2.new(0, 36, 0, 36),
 		Position = UDim2.new(0, 8, 0, 10),
 		BackgroundColor3 = Theme.SurfaceLight,
-		Parent = ProfileHeader,
+		Parent = ProfileFooter,
 	})
 	corner(AvatarImage, 18)
 	stroke(AvatarImage, Theme.Border, 1)
@@ -348,7 +362,7 @@ function EchoUI:CreateWindow(config)
 		Size = UDim2.new(1, -60, 0, 16),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,
-		Parent = ProfileHeader,
+		Parent = ProfileFooter,
 	})
 
 	make("TextLabel", {
@@ -361,8 +375,19 @@ function EchoUI:CreateWindow(config)
 		Size = UDim2.new(1, -60, 0, 14),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,
-		Parent = ProfileHeader,
+		Parent = ProfileFooter,
 	})
+
+	local ProfileClickCatcher = make("TextButton", {
+		Text = "",
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0),
+		ZIndex = 2,
+		Parent = ProfileFooter,
+	})
+	ProfileClickCatcher.MouseEnter:Connect(function() tween(ProfileFooter, { BackgroundColor3 = Theme.SurfaceLight }, 0.15) end)
+	ProfileClickCatcher.MouseLeave:Connect(function() tween(ProfileFooter, { BackgroundColor3 = Theme.Surface }, 0.15) end)
+
 	local TabList = make("UIListLayout", {
 		Padding = UDim.new(0, 4),
 		SortOrder = Enum.SortOrder.LayoutOrder,
@@ -376,6 +401,52 @@ function EchoUI:CreateWindow(config)
 		Parent = TabBar,
 	})
 
+	-- Playtime page (shown when the profile footer is clicked)
+	local InjectedAt = tick()
+	local PlaytimePage = make("Frame", {
+		Name = "PlaytimePage",
+		Size = UDim2.new(1, -20, 1, -20),
+		Position = UDim2.new(0, 10, 0, 10),
+		BackgroundTransparency = 1,
+		Visible = false,
+		Parent = nil, -- set once ContentArea exists, below
+	})
+
+	local PlaytimeLabel = make("TextLabel", {
+		Text = "Playtime this session",
+		Font = Enum.Font.GothamBold,
+		TextSize = 16,
+		TextColor3 = Theme.Text,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 24),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = PlaytimePage,
+	})
+
+	local PlaytimeValue = make("TextLabel", {
+		Text = "00:00:00",
+		Font = Enum.Font.GothamBold,
+		TextSize = 32,
+		TextColor3 = Theme.AccentAlt,
+		BackgroundTransparency = 1,
+		Position = UDim2.new(0, 0, 0, 32),
+		Size = UDim2.new(1, 0, 0, 44),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = PlaytimePage,
+	})
+
+	make("TextLabel", {
+		Text = "Since the menu was injected",
+		Font = Enum.Font.Gotham,
+		TextSize = 12,
+		TextColor3 = Theme.SubText,
+		BackgroundTransparency = 1,
+		Position = UDim2.new(0, 0, 0, 80),
+		Size = UDim2.new(1, 0, 0, 16),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = PlaytimePage,
+	})
+
 	-- Content area (right side)
 	local ContentArea = make("Frame", {
 		Name = "ContentArea",
@@ -385,6 +456,8 @@ function EchoUI:CreateWindow(config)
 		Parent = Main,
 	})
 
+	PlaytimePage.Parent = ContentArea
+
 	local Window = setmetatable({
 		ScreenGui = ScreenGui,
 		Main = Main,
@@ -393,7 +466,79 @@ function EchoUI:CreateWindow(config)
 		ContentArea = ContentArea,
 		Tabs = {},
 		ActiveTab = nil,
+		OriginalSize = size,
+		Minimized = false,
+		HasShownMinimizeNotice = false,
+		ToggleKey = config.ToggleKey or Enum.KeyCode.RightShift,
+		PlaytimePage = PlaytimePage,
 	}, EchoUI)
+
+	function Window:ShowPlaytime()
+		for _, t in ipairs(self.Tabs) do
+			t.Page.Visible = false
+			tween(t.Button, { BackgroundTransparency = 1 }, 0.15)
+			tween(t.Label, { TextColor3 = Theme.SubText }, 0.15)
+			if t.Icon then
+				tween(t.Icon, { ImageColor3 = Theme.SubText }, 0.15)
+			end
+		end
+		PlaytimePage.Visible = true
+		self.ActiveTab = nil
+	end
+
+	function Window:ToggleMinimize()
+		self.Minimized = not self.Minimized
+
+		if self.Minimized then
+			tween(self.Main, { Size = UDim2.fromOffset(0, 0) }, 0.2)
+			task.delay(0.2, function()
+				self.Main.Visible = false
+			end)
+
+			if not self.HasShownMinimizeNotice then
+				self.HasShownMinimizeNotice = true
+				task.delay(0.25, function()
+					EchoUI:Notify({
+						Title = "Menu Minimized",
+						Content = "Press " .. self.ToggleKey.Name .. " to bring it back.",
+						Duration = 5,
+					})
+				end)
+			end
+		else
+			self.Main.Visible = true
+			self.Main.Size = UDim2.fromOffset(0, 0)
+			tween(self.Main, { Size = self.OriginalSize }, 0.2)
+		end
+	end
+
+	MinimizeBtn.MouseButton1Click:Connect(function()
+		Window:ToggleMinimize()
+	end)
+
+	UserInputService.InputBegan:Connect(function(input, processed)
+		if processed then return end
+		if input.KeyCode == Window.ToggleKey then
+			Window:ToggleMinimize()
+		end
+	end)
+
+	ProfileClickCatcher.MouseButton1Click:Connect(function()
+		Window:ShowPlaytime()
+	end)
+
+	task.spawn(function()
+		while ScreenGui.Parent do
+			if PlaytimePage.Visible then
+				local elapsed = math.floor(tick() - InjectedAt)
+				local h = math.floor(elapsed / 3600)
+				local m = math.floor((elapsed % 3600) / 60)
+				local s = elapsed % 60
+				PlaytimeValue.Text = string.format("%02d:%02d:%02d", h, m, s)
+			end
+			task.wait(1)
+		end
+	end)
 
 	-- percent: 50 to 200 (e.g. 100 = normal size, 150 = 150%)
 	function Window:SetScale(percent)
@@ -493,6 +638,9 @@ function EchoUI:CreateTab(name, icon)
 			if t.Icon then
 				tween(t.Icon, { ImageColor3 = Theme.SubText }, 0.15)
 			end
+		end
+		if self.PlaytimePage then
+			self.PlaytimePage.Visible = false
 		end
 		Page.Visible = true
 		tween(TabButton, { BackgroundTransparency = 0 }, 0.15)
@@ -844,6 +992,73 @@ function EchoUI:CreateTab(name, icon)
 		return {
 			Set = function(_, v) Box.Text = v end,
 			Get = function() return Box.Text end,
+		}
+	end
+
+	-- =========================================================
+	-- ELEMENT: Keybind
+	-- =========================================================
+	function Tab:CreateKeybind(opts)
+		opts = opts or {}
+		local currentKey = opts.CurrentKeybind or Enum.KeyCode.RightShift
+		local listening = false
+
+		local Holder = make("Frame", {
+			Size = UDim2.new(1, 0, 0, 36),
+			BackgroundColor3 = Theme.Surface,
+			Parent = Page,
+		})
+		corner(Holder, 6)
+		stroke(Holder, Theme.Border, 1)
+
+		make("TextLabel", {
+			Text = opts.Name or "Keybind",
+			Font = Enum.Font.Gotham,
+			TextSize = 13,
+			TextColor3 = Theme.Text,
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0, 12, 0, 0),
+			Size = UDim2.new(1, -110, 1, 0),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Parent = Holder,
+		})
+
+		local KeyBtn = make("TextButton", {
+			Text = currentKey.Name,
+			Font = Enum.Font.GothamBold,
+			TextSize = 12,
+			TextColor3 = Theme.AccentAlt,
+			BackgroundColor3 = Theme.SurfaceLight,
+			Size = UDim2.new(0, 90, 0, 26),
+			Position = UDim2.new(1, -98, 0.5, -13),
+			Parent = Holder,
+		})
+		corner(KeyBtn, 5)
+
+		KeyBtn.MouseButton1Click:Connect(function()
+			if listening then return end
+			listening = true
+			local originalText = KeyBtn.Text
+			KeyBtn.Text = "..."
+
+			local conn
+			conn = UserInputService.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.Keyboard then
+					currentKey = input.KeyCode
+					KeyBtn.Text = currentKey.Name
+					listening = false
+					conn:Disconnect()
+					if opts.Callback then
+						local ok, err = pcall(opts.Callback, currentKey)
+						if not ok then warn("[EchoUI] Keybind callback error: " .. tostring(err)) end
+					end
+				end
+			end)
+		end)
+
+		return {
+			Set = function(_, key) currentKey = key; KeyBtn.Text = key.Name end,
+			Get = function() return currentKey end,
 		}
 	end
 
