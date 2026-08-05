@@ -18,21 +18,21 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local EchoUI = {}
 EchoUI.__index = EchoUI
 
-print("[EchoUI] Loaded version: v2.0-echohub-theme")
+print("[EchoUI] Loaded version: v2.1-black-purple-theme")
 
 -- ============================================================
 -- THEME
 -- ============================================================
 local Theme = {
-	Background   = Color3.fromRGB(30, 68, 105),   -- medium blue (sidebar/topbar base)
-	Surface      = Color3.fromRGB(19, 47, 74),    -- darker blue content cards
-	SurfaceLight = Color3.fromRGB(26, 60, 92),    -- hover / lighter card
-	Border       = Color3.fromRGB(50, 96, 138),
-	Accent       = Color3.fromRGB(50, 145, 230),  -- blue accent (selected, sliders)
-	AccentAlt    = Color3.fromRGB(70, 180, 255),
+	Background   = Color3.fromRGB(8, 8, 10),      -- near-black
+	Surface      = Color3.fromRGB(16, 15, 20),    -- dark card background
+	SurfaceLight = Color3.fromRGB(26, 22, 34),    -- hover / lighter card
+	Border       = Color3.fromRGB(45, 38, 58),
+	Accent       = Color3.fromRGB(150, 60, 230),  -- purple
+	AccentAlt    = Color3.fromRGB(190, 110, 255),
 	Text         = Color3.fromRGB(255, 255, 255),
-	SubText      = Color3.fromRGB(190, 213, 232),
-	Success      = Color3.fromRGB(60, 200, 100),  -- green toggle
+	SubText      = Color3.fromRGB(160, 155, 175),
+	Success      = Color3.fromRGB(150, 60, 230),  -- toggles use the purple accent now
 	Danger       = Color3.fromRGB(230, 80, 90),
 }
 
@@ -544,8 +544,8 @@ function EchoUI:CreateWindow(config)
 	-- NOT to TabBar, so the tab UIListLayout can't reposition it
 	local ProfileFooter = make("Frame", {
 		Name = "ProfileFooter",
-		Size = UDim2.new(0, SidebarWidth, 0, 56),
-		Position = UDim2.new(0, 0, 1, -56),
+		Size = UDim2.new(0, SidebarWidth, 0, 76),
+		Position = UDim2.new(0, 0, 1, -76),
 		BackgroundColor3 = Theme.Background,
 		Parent = Main,
 	})
@@ -559,13 +559,13 @@ function EchoUI:CreateWindow(config)
 	})
 
 	local AvatarImage = make("ImageLabel", {
-		Size = UDim2.new(0, 36, 0, 36),
-		Position = UDim2.new(0, 8, 0, 10),
+		Size = UDim2.new(0, 44, 0, 44),
+		Position = UDim2.new(0, 12, 0, 16),
 		BackgroundColor3 = Theme.SurfaceLight,
 		Parent = ProfileFooter,
 	})
-	corner(AvatarImage, 18)
-	stroke(AvatarImage, Theme.Border, 1)
+	corner(AvatarImage, 22)
+	stroke(AvatarImage, Theme.Accent, 2)
 
 	local ok, content = pcall(function()
 		return Players:GetUserThumbnailAsync(
@@ -578,30 +578,46 @@ function EchoUI:CreateWindow(config)
 		AvatarImage.Image = content
 	end
 
+	-- online status dot
+	local StatusDot = make("Frame", {
+		Size = UDim2.new(0, 12, 0, 12),
+		Position = UDim2.new(1, -12, 1, -12),
+		BackgroundColor3 = Color3.fromRGB(60, 220, 120),
+		Parent = AvatarImage,
+	})
+	corner(StatusDot, 6)
+	stroke(StatusDot, Theme.Background, 2)
+
 	make("TextLabel", {
 		Text = LocalPlayer.DisplayName,
 		Font = Enum.Font.GothamBold,
-		TextSize = 13,
+		TextSize = 14,
 		TextColor3 = Theme.Text,
 		BackgroundTransparency = 1,
-		Position = UDim2.new(0, 52, 0, 12),
-		Size = UDim2.new(1, -60, 0, 16),
+		Position = UDim2.new(0, 64, 0, 16),
+		Size = UDim2.new(1, -72, 0, 18),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,
 		Parent = ProfileFooter,
 	})
 
-	make("TextLabel", {
-		Text = "@" .. LocalPlayer.Name,
-		Font = Enum.Font.Gotham,
-		TextSize = 11,
-		TextColor3 = Theme.SubText,
-		BackgroundTransparency = 1,
-		Position = UDim2.new(0, 52, 0, 28),
-		Size = UDim2.new(1, -60, 0, 14),
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextTruncate = Enum.TextTruncate.AtEnd,
+	local PremiumBadge = make("Frame", {
+		Size = UDim2.new(0, 62, 0, 18),
+		Position = UDim2.new(0, 64, 0, 38),
+		BackgroundColor3 = Theme.Accent,
+		BackgroundTransparency = 0.15,
 		Parent = ProfileFooter,
+	})
+	corner(PremiumBadge, 9)
+	make("TextLabel", {
+		Text = "★ Premium",
+		Font = Enum.Font.GothamBold,
+		TextSize = 10,
+		TextColor3 = Theme.Text,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0),
+		TextXAlignment = Enum.TextXAlignment.Center,
+		Parent = PremiumBadge,
 	})
 
 	local ProfileClickCatcher = make("TextButton", {
@@ -623,7 +639,7 @@ function EchoUI:CreateWindow(config)
 		PaddingTop = UDim.new(0, 10),
 		PaddingLeft = UDim.new(0, 8),
 		PaddingRight = UDim.new(0, 8),
-		PaddingBottom = UDim.new(0, 64),
+		PaddingBottom = UDim.new(0, 84),
 		Parent = TabBar,
 	})
 
@@ -793,6 +809,8 @@ function EchoUI:CreateTab(name, icon)
 		Parent = self.TabBar,
 	})
 	corner(TabButton, 8)
+	local TabButtonStroke = stroke(TabButton, Theme.Accent, 1)
+	TabButtonStroke.Transparency = 1
 
 	local IconImage
 	local labelXOffset = 14
@@ -860,6 +878,7 @@ function EchoUI:CreateTab(name, icon)
 		for _, t in ipairs(self.Tabs) do
 			t.Page.Visible = false
 			tween(t.Button, { BackgroundTransparency = 1 }, 0.15)
+			tween(t.BorderStroke, { Transparency = 1 }, 0.15)
 			tween(t.Label, { TextColor3 = Theme.SubText }, 0.15)
 			if t.Icon then
 				tween(t.Icon, { ImageColor3 = Theme.SubText }, 0.15)
@@ -869,8 +888,9 @@ function EchoUI:CreateTab(name, icon)
 			self.PlaytimePage.Visible = false
 		end
 		Page.Visible = true
-		tween(TabButton, { BackgroundTransparency = 0 }, 0.15)
-		tween(TabLabel, { TextColor3 = Theme.Text }, 0.15)
+		tween(TabButton, { BackgroundTransparency = 0.82 }, 0.15)
+		tween(TabButtonStroke, { Transparency = 0.4 }, 0.15)
+		tween(TabLabel, { TextColor3 = Theme.AccentAlt }, 0.15)
 		if IconImage then
 			tween(IconImage, { ImageColor3 = Theme.AccentAlt }, 0.15)
 		end
@@ -881,6 +901,7 @@ function EchoUI:CreateTab(name, icon)
 
 	Tab.Label = TabLabel
 	Tab.Icon = IconImage
+	Tab.BorderStroke = TabButtonStroke
 
 	table.insert(self.Tabs, Tab)
 	if #self.Tabs == 1 then activate() end
