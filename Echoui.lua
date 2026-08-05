@@ -1,3 +1,12 @@
+--[[
+	EchoUI - Lightweight Roblox UI Library
+	Usage:
+		local EchoUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/YOURNAME/YOURREPO/main/EchoUI.lua"))()
+		local Window = EchoUI:CreateWindow({ Title = "Echo Menu" })
+		local Tab = Window:CreateTab("Main")
+		Tab:CreateButton({ Name = "Click Me", Callback = function() print("clicked") end })
+]]
+
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
@@ -9,7 +18,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local EchoUI = {}
 EchoUI.__index = EchoUI
 
-print("[EchoUI] Loaded version: v1.7-zindex-fix")
+print("[EchoUI] Loaded version: v1.8-scroll-fix")
 
 -- ============================================================
 -- THEME
@@ -1262,9 +1271,17 @@ function EchoUI:CreateTab(name, icon)
 		ListLayout.Parent = ScrollFrame
 
 		local open = false
+		local baseHolderSize = Holder.Size
+		local listHeight = math.min(#options, 5) * 30
+
 		Label.MouseButton1Click:Connect(function()
 			open = not open
 			ListFrame.Visible = open
+			if open then
+				Holder.Size = UDim2.new(baseHolderSize.X.Scale, baseHolderSize.X.Offset, 0, baseHolderSize.Y.Offset + listHeight + 4)
+			else
+				Holder.Size = baseHolderSize
+			end
 		end)
 
 		for i, opt in ipairs(options) do
