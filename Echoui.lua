@@ -18,7 +18,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local EchoUI = {}
 EchoUI.__index = EchoUI
 
-print("[EchoUI] Loaded version: v1.4-togglekey-fix")
+print("[EchoUI] Loaded version: v1.5-colorpicker")
 
 -- ============================================================
 -- THEME
@@ -857,6 +857,182 @@ function EchoUI:CreateTab(name, icon)
 		return {
 			Set = function(_, v) setFromAlpha((v - min) / (max - min)) end,
 			Get = function() return value end,
+		}
+	end
+
+	-- =========================================================
+	-- ELEMENT: Color Picker
+	-- =========================================================
+	function Tab:CreateColorPicker(opts)
+		opts = opts or {}
+		local color = opts.Color or Color3.fromRGB(255, 255, 255)
+		local expanded = false
+
+		local Holder = make("Frame", {
+			Size = UDim2.new(1, 0, 0, 36),
+			BackgroundColor3 = Theme.Surface,
+			ClipsDescendants = false,
+			Parent = Page,
+		})
+		corner(Holder, 6)
+		stroke(Holder, Theme.Border, 1)
+
+		make("TextLabel", {
+			Text = opts.Name or "Color",
+			Font = Enum.Font.Gotham,
+			TextSize = 13,
+			TextColor3 = Theme.Text,
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0, 12, 0, 0),
+			Size = UDim2.new(1, -50, 1, 0),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Parent = Holder,
+		})
+
+		local SwatchBtn = make("TextButton", {
+			Text = "",
+			BackgroundColor3 = color,
+			Size = UDim2.new(0, 26, 0, 20),
+			Position = UDim2.new(1, -36, 0.5, -10),
+			Parent = Holder,
+		})
+		corner(SwatchBtn, 5)
+		stroke(SwatchBtn, Theme.Border, 1)
+
+		local Panel = make("Frame", {
+			Size = UDim2.new(1, 0, 0, 110),
+			Position = UDim2.new(0, 0, 1, 4),
+			BackgroundColor3 = Theme.SurfaceLight,
+			Visible = false,
+			ZIndex = 5,
+			Parent = Holder,
+		})
+		corner(Panel, 6)
+		stroke(Panel, Theme.Border, 1)
+		make("UIPadding", {
+			PaddingTop = UDim.new(0, 8),
+			PaddingLeft = UDim.new(0, 10),
+			PaddingRight = UDim.new(0, 10),
+			Parent = Panel,
+		})
+
+		local r, g, b = math.floor(color.R * 255), math.floor(color.G * 255), math.floor(color.B * 255)
+
+		local function fireCallback()
+			SwatchBtn.BackgroundColor3 = color
+			if opts.Callback then
+				local ok, err = pcall(opts.Callback, color)
+				if not ok then warn("[EchoUI] ColorPicker callback error: " .. tostring(err)) end
+			end
+		end
+
+		local function makeChannelSlider(labelText, initial, yOffset, channelColor, onChange)
+			local Row = make("Frame", {
+				Size = UDim2.new(1, 0, 0, 26),
+				Position = UDim2.new(0, 0, 0, yOffset),
+				BackgroundTransparency = 1,
+				ZIndex = 5,
+				Parent = Panel,
+			})
+
+			make("TextLabel", {
+				Text = labelText,
+				Font = Enum.Font.GothamBold,
+				TextSize = 11,
+				TextColor3 = channelColor,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 16, 1, 0),
+				ZIndex = 5,
+				Parent = Row,
+			})
+
+			local Track = make("Frame", {
+				Size = UDim2.new(1, -50, 0, 6),
+				Position = UDim2.new(0, 20, 0.5, -3),
+				BackgroundColor3 = Theme.Background,
+				ZIndex = 5,
+				Parent = Row,
+			})
+			corner(Track, 3)
+
+			local Fill = make("Frame", {
+				Size = UDim2.new(initial / 255, 0, 1, 0),
+				BackgroundColor3 = channelColor,
+				ZIndex = 5,
+				Parent = Track,
+			})
+			corner(Fill, 3)
+
+			local ValLabel = make("TextLabel", {
+				Text = tostring(initial),
+				Font = Enum.Font.Gotham,
+				TextSize = 11,
+				TextColor3 = Theme.SubText,
+				BackgroundTransparency = 1,
+				Position = UDim2.new(1, -26, 0, 0),
+				Size = UDim2.new(0, 26, 1, 0),
+				TextXAlignment = Enum.TextXAlignment.Right,
+				ZIndex = 5,
+				Parent = Row,
+			})
+
+			local dragging = false
+			local function setFromAlpha(alpha)
+				alpha = math.clamp(alpha, 0, 1)
+				local val = math.floor(alpha * 255 + 0.5)
+				Fill.Size = UDim2.new(alpha, 0, 1, 0)
+				ValLabel.Text = tostring(val)
+				onChange(val)
+			end
+
+			Track.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+					dragging = true
+					local alpha = (input.Position.X - Track.AbsolutePosition.X) / Track.AbsoluteSize.X
+					setFromAlpha(alpha)
+				end
+			end)
+			UserInputService.InputChanged:Connect(function(input)
+				if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+					local alpha = (input.Position.X - Track.AbsolutePosition.X) / Track.AbsoluteSize.X
+					setFromAlpha(alpha)
+				end
+			end)
+			UserInputService.InputEnded:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+					dragging = false
+				end
+			end)
+		end
+
+		makeChannelSlider("R", r, 0, Color3.fromRGB(255, 90, 90), function(v)
+			r = v
+			color = Color3.fromRGB(r, g, b)
+			fireCallback()
+		end)
+		makeChannelSlider("G", g, 32, Color3.fromRGB(90, 255, 120), function(v)
+			g = v
+			color = Color3.fromRGB(r, g, b)
+			fireCallback()
+		end)
+		makeChannelSlider("B", b, 64, Color3.fromRGB(100, 140, 255), function(v)
+			b = v
+			color = Color3.fromRGB(r, g, b)
+			fireCallback()
+		end)
+
+		SwatchBtn.MouseButton1Click:Connect(function()
+			expanded = not expanded
+			Panel.Visible = expanded
+		end)
+
+		return {
+			Set = function(_, c)
+				color = c
+				r, g, b = math.floor(c.R * 255), math.floor(c.G * 255), math.floor(c.B * 255)
+				SwatchBtn.BackgroundColor3 = color
+			end,
+			Get = function() return color end,
 		}
 	end
 
