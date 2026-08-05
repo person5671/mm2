@@ -1,12 +1,3 @@
---[[
-	EchoUI - Lightweight Roblox UI Library
-	Usage:
-		local EchoUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/YOURNAME/YOURREPO/main/EchoUI.lua"))()
-		local Window = EchoUI:CreateWindow({ Title = "Echo Menu" })
-		local Tab = Window:CreateTab("Main")
-		Tab:CreateButton({ Name = "Click Me", Callback = function() print("clicked") end })
-]]
-
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
