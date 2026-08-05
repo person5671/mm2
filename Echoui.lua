@@ -18,7 +18,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local EchoUI = {}
 EchoUI.__index = EchoUI
 
-print("[EchoUI] Loaded version: v1.6-inline-swatch")
+print("[EchoUI] Loaded version: v1.7-zindex-fix")
 
 -- ============================================================
 -- THEME
@@ -243,9 +243,17 @@ local function attachColorSwatch(Holder, position, initialColor, callback)
 		fire()
 	end)
 
+	local baseHolderSize = Holder.Size
+	local panelHeight = 100
+
 	SwatchBtn.MouseButton1Click:Connect(function()
 		expanded = not expanded
 		Panel.Visible = expanded
+		if expanded then
+			Holder.Size = UDim2.new(baseHolderSize.X.Scale, baseHolderSize.X.Offset, 0, baseHolderSize.Y.Offset + panelHeight + 4)
+		else
+			Holder.Size = baseHolderSize
+		end
 	end)
 
 	return {
@@ -1186,9 +1194,17 @@ function EchoUI:CreateTab(name, icon)
 			fireCallback()
 		end)
 
+		local baseHolderSize = Holder.Size
+		local panelHeight = 110
+
 		SwatchBtn.MouseButton1Click:Connect(function()
 			expanded = not expanded
 			Panel.Visible = expanded
+			if expanded then
+				Holder.Size = UDim2.new(baseHolderSize.X.Scale, baseHolderSize.X.Offset, 0, baseHolderSize.Y.Offset + panelHeight + 4)
+			else
+				Holder.Size = baseHolderSize
+			end
 		end)
 
 		return {
