@@ -280,7 +280,7 @@ function EchoUI:CreateWindow(config)
 	local ScreenGui = make("ScreenGui", {
 		Name = "EchoUI_" .. title,
 		ResetOnSpawn = false,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		ZIndexBehavior = Enum.ZIndexBehavior.Global,
 		IgnoreGuiInset = true,
 		Parent = PlayerGui,
 	})
