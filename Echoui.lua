@@ -18,23 +18,25 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local EchoUI = {}
 EchoUI.__index = EchoUI
 
-print("[EchoUI] Loaded version: v1.8-scroll-fix")
+print("[EchoUI] Loaded version: v2.1-black-purple-theme")
 
 -- ============================================================
 -- THEME
 -- ============================================================
 local Theme = {
-	Background   = Color3.fromRGB(18, 18, 24),
-	Surface      = Color3.fromRGB(26, 26, 34),
-	SurfaceLight = Color3.fromRGB(34, 34, 44),
-	Border       = Color3.fromRGB(48, 48, 60),
-	Accent       = Color3.fromRGB(90, 60, 220),   -- purple
-	AccentAlt    = Color3.fromRGB(45, 210, 200),  -- teal
-	Text         = Color3.fromRGB(235, 235, 245),
-	SubText      = Color3.fromRGB(150, 150, 165),
-	Success      = Color3.fromRGB(80, 220, 130),
+	Background   = Color3.fromRGB(8, 8, 10),      -- near-black
+	Surface      = Color3.fromRGB(16, 15, 20),    -- dark card background
+	SurfaceLight = Color3.fromRGB(26, 22, 34),    -- hover / lighter card
+	Border       = Color3.fromRGB(45, 38, 58),
+	Accent       = Color3.fromRGB(150, 60, 230),  -- purple
+	AccentAlt    = Color3.fromRGB(190, 110, 255),
+	Text         = Color3.fromRGB(255, 255, 255),
+	SubText      = Color3.fromRGB(160, 155, 175),
+	Success      = Color3.fromRGB(150, 60, 230),  -- toggles use the purple accent now
 	Danger       = Color3.fromRGB(230, 80, 90),
 }
+
+local SidebarWidth = 220
 
 local function tween(obj, props, time, style, dir)
 	local t = TweenService:Create(obj, TweenInfo.new(
@@ -122,7 +124,7 @@ local function attachColorSwatch(Holder, position, initialColor, callback)
 	stroke(SwatchBtn, Theme.Border, 1)
 
 	local Panel = make("Frame", {
-		Size = UDim2.new(1, 0, 0, 100),
+		Size = UDim2.new(1, 0, 0, 76),
 		Position = UDim2.new(0, 0, 1, 4),
 		BackgroundColor3 = Theme.SurfaceLight,
 		Visible = false,
@@ -132,7 +134,7 @@ local function attachColorSwatch(Holder, position, initialColor, callback)
 	corner(Panel, 6)
 	stroke(Panel, Theme.Border, 1)
 	make("UIPadding", {
-		PaddingTop = UDim.new(0, 8),
+		PaddingTop = UDim.new(0, 6),
 		PaddingLeft = UDim.new(0, 10),
 		PaddingRight = UDim.new(0, 10),
 		Parent = Panel,
@@ -150,7 +152,7 @@ local function attachColorSwatch(Holder, position, initialColor, callback)
 
 	local function makeChannelSlider(labelText, initial, yOffset, channelColor, onChange)
 		local Row = make("Frame", {
-			Size = UDim2.new(1, 0, 0, 26),
+			Size = UDim2.new(1, 0, 0, 20),
 			Position = UDim2.new(0, 0, 0, yOffset),
 			BackgroundTransparency = 1,
 			ZIndex = 5,
@@ -232,19 +234,19 @@ local function attachColorSwatch(Holder, position, initialColor, callback)
 		color = Color3.fromRGB(r, g, b)
 		fire()
 	end)
-	makeChannelSlider("G", g, 32, Color3.fromRGB(90, 255, 120), function(v)
+	makeChannelSlider("G", g, 24, Color3.fromRGB(90, 255, 120), function(v)
 		g = v
 		color = Color3.fromRGB(r, g, b)
 		fire()
 	end)
-	makeChannelSlider("B", b, 64, Color3.fromRGB(100, 140, 255), function(v)
+	makeChannelSlider("B", b, 48, Color3.fromRGB(100, 140, 255), function(v)
 		b = v
 		color = Color3.fromRGB(r, g, b)
 		fire()
 	end)
 
 	local baseHolderSize = Holder.Size
-	local panelHeight = 100
+	local panelHeight = 76
 
 	SwatchBtn.MouseButton1Click:Connect(function()
 		expanded = not expanded
@@ -274,7 +276,7 @@ function EchoUI:CreateWindow(config)
 	config = config or {}
 	local title = config.Title or "Echo UI"
 	local subtitle = config.Subtitle or ""
-	local size = config.Size or UDim2.fromOffset(720, 460)
+	local size = config.Size or UDim2.fromOffset(860, 520)
 	local loadingEnabled = config.LoadingEnabled
 	if loadingEnabled == nil then loadingEnabled = true end
 	local loadingTitle = config.LoadingTitle or title
@@ -397,8 +399,8 @@ function EchoUI:CreateWindow(config)
 
 	local TopBar = make("Frame", {
 		Name = "TopBar",
-		Size = UDim2.new(1, 0, 0, 44),
-		BackgroundColor3 = Theme.Surface,
+		Size = UDim2.new(1, 0, 0, 64),
+		BackgroundColor3 = Theme.Background,
 		Parent = Main,
 	})
 	corner(TopBar, 10)
@@ -407,19 +409,49 @@ function EchoUI:CreateWindow(config)
 	make("Frame", {
 		Size = UDim2.new(1, 0, 0, 10),
 		Position = UDim2.new(0, 0, 1, -10),
-		BackgroundColor3 = Theme.Surface,
+		BackgroundColor3 = Theme.Background,
 		BorderSizePixel = 0,
 		Parent = TopBar,
+	})
+
+	-- thin separator under the whole top bar
+	make("Frame", {
+		Size = UDim2.new(1, 0, 0, 1),
+		Position = UDim2.new(0, 0, 1, 0),
+		BackgroundColor3 = Theme.Border,
+		BorderSizePixel = 0,
+		Parent = TopBar,
+	})
+
+	-- Logo circle
+	local LogoCircle = make("Frame", {
+		Size = UDim2.new(0, 40, 0, 40),
+		Position = UDim2.new(0, 14, 0, 12),
+		BackgroundColor3 = Color3.fromRGB(10, 10, 14),
+		Parent = TopBar,
+	})
+	corner(LogoCircle, 20)
+	stroke(LogoCircle, Theme.Accent, 1)
+
+	make("TextLabel", {
+		Text = string.sub(title, 1, 1),
+		Font = Enum.Font.GothamBold,
+		TextSize = 18,
+		TextColor3 = Theme.Accent,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0),
+		TextXAlignment = Enum.TextXAlignment.Center,
+		Parent = LogoCircle,
 	})
 
 	local TitleLabel = make("TextLabel", {
 		Text = title,
 		Font = Enum.Font.GothamBold,
-		TextSize = 15,
+		TextSize = 16,
 		TextColor3 = Theme.Text,
 		BackgroundTransparency = 1,
-		Position = UDim2.new(0, 14, 0, 4),
-		Size = UDim2.new(1, -28, 0, 18),
+		Position = UDim2.new(0, 64, 0, 12),
+		Size = UDim2.new(0, 220, 0, 20),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		Parent = TopBar,
 	})
@@ -427,23 +459,53 @@ function EchoUI:CreateWindow(config)
 	make("TextLabel", {
 		Text = subtitle,
 		Font = Enum.Font.Gotham,
-		TextSize = 11,
+		TextSize = 12,
 		TextColor3 = Theme.SubText,
 		BackgroundTransparency = 1,
-		Position = UDim2.new(0, 14, 0, 22),
-		Size = UDim2.new(1, -28, 0, 16),
+		Position = UDim2.new(0, 64, 0, 32),
+		Size = UDim2.new(0, 220, 0, 16),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		Parent = TopBar,
+	})
+
+	-- Search box (visual only - filters nothing on its own, hook SearchBox:GetPropertyChangedSignal("Text") if you want live filtering)
+	local SearchBox = make("TextBox", {
+		Name = "SearchBox",
+		PlaceholderText = "Search..",
+		Text = "",
+		Font = Enum.Font.Gotham,
+		TextSize = 13,
+		TextColor3 = Theme.Text,
+		PlaceholderColor3 = Theme.SubText,
+		BackgroundColor3 = Theme.Surface,
+		Size = UDim2.new(0, 200, 0, 30),
+		Position = UDim2.new(1, -272, 0, 17),
+		ClearTextOnFocus = false,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = TopBar,
+	})
+	corner(SearchBox, 8)
+	stroke(SearchBox, Theme.Border, 1)
+	make("UIPadding", { PaddingLeft = UDim.new(0, 30), Parent = SearchBox })
+	make("TextLabel", {
+		Text = "🔍",
+		Font = Enum.Font.Gotham,
+		TextSize = 12,
+		TextColor3 = Theme.SubText,
+		BackgroundTransparency = 1,
+		Position = UDim2.new(0, 8, 0, 0),
+		Size = UDim2.new(0, 16, 1, 0),
+		Parent = SearchBox,
 	})
 
 	local CloseBtn = make("TextButton", {
 		Text = "×",
 		Font = Enum.Font.GothamBold,
-		TextSize = 20,
+		TextSize = 22,
 		TextColor3 = Theme.SubText,
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0, 32, 0, 32),
-		Position = UDim2.new(1, -38, 0, 6),
+		Position = UDim2.new(1, -46, 0, 16),
 		Parent = TopBar,
 	})
 	CloseBtn.MouseButton1Click:Connect(function()
@@ -457,11 +519,11 @@ function EchoUI:CreateWindow(config)
 	local MinimizeBtn = make("TextButton", {
 		Text = "–",
 		Font = Enum.Font.GothamBold,
-		TextSize = 20,
+		TextSize = 22,
 		TextColor3 = Theme.SubText,
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0, 32, 0, 32),
-		Position = UDim2.new(1, -70, 0, 6),
+		Position = UDim2.new(1, -80, 0, 16),
 		Parent = TopBar,
 	})
 	MinimizeBtn.MouseEnter:Connect(function() tween(MinimizeBtn, { TextColor3 = Theme.Text }, 0.15) end)
@@ -472,9 +534,9 @@ function EchoUI:CreateWindow(config)
 	-- Tab bar (left column)
 	local TabBar = make("Frame", {
 		Name = "TabBar",
-		Size = UDim2.new(0, 130, 1, -44),
-		Position = UDim2.new(0, 0, 0, 44),
-		BackgroundColor3 = Theme.Surface,
+		Size = UDim2.new(0, SidebarWidth, 1, -64),
+		Position = UDim2.new(0, 0, 0, 64),
+		BackgroundColor3 = Theme.Background,
 		Parent = Main,
 	})
 
@@ -482,9 +544,9 @@ function EchoUI:CreateWindow(config)
 	-- NOT to TabBar, so the tab UIListLayout can't reposition it
 	local ProfileFooter = make("Frame", {
 		Name = "ProfileFooter",
-		Size = UDim2.new(0, 130, 0, 56),
-		Position = UDim2.new(0, 0, 1, -56),
-		BackgroundColor3 = Theme.Surface,
+		Size = UDim2.new(0, SidebarWidth, 0, 76),
+		Position = UDim2.new(0, 0, 1, -76),
+		BackgroundColor3 = Theme.Background,
 		Parent = Main,
 	})
 
@@ -497,13 +559,13 @@ function EchoUI:CreateWindow(config)
 	})
 
 	local AvatarImage = make("ImageLabel", {
-		Size = UDim2.new(0, 36, 0, 36),
-		Position = UDim2.new(0, 8, 0, 10),
+		Size = UDim2.new(0, 44, 0, 44),
+		Position = UDim2.new(0, 12, 0, 16),
 		BackgroundColor3 = Theme.SurfaceLight,
 		Parent = ProfileFooter,
 	})
-	corner(AvatarImage, 18)
-	stroke(AvatarImage, Theme.Border, 1)
+	corner(AvatarImage, 22)
+	stroke(AvatarImage, Theme.Accent, 2)
 
 	local ok, content = pcall(function()
 		return Players:GetUserThumbnailAsync(
@@ -516,30 +578,46 @@ function EchoUI:CreateWindow(config)
 		AvatarImage.Image = content
 	end
 
+	-- online status dot
+	local StatusDot = make("Frame", {
+		Size = UDim2.new(0, 12, 0, 12),
+		Position = UDim2.new(1, -12, 1, -12),
+		BackgroundColor3 = Color3.fromRGB(60, 220, 120),
+		Parent = AvatarImage,
+	})
+	corner(StatusDot, 6)
+	stroke(StatusDot, Theme.Background, 2)
+
 	make("TextLabel", {
 		Text = LocalPlayer.DisplayName,
 		Font = Enum.Font.GothamBold,
-		TextSize = 13,
+		TextSize = 14,
 		TextColor3 = Theme.Text,
 		BackgroundTransparency = 1,
-		Position = UDim2.new(0, 52, 0, 12),
-		Size = UDim2.new(1, -60, 0, 16),
+		Position = UDim2.new(0, 64, 0, 16),
+		Size = UDim2.new(1, -72, 0, 18),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,
 		Parent = ProfileFooter,
 	})
 
-	make("TextLabel", {
-		Text = "@" .. LocalPlayer.Name,
-		Font = Enum.Font.Gotham,
-		TextSize = 11,
-		TextColor3 = Theme.SubText,
-		BackgroundTransparency = 1,
-		Position = UDim2.new(0, 52, 0, 28),
-		Size = UDim2.new(1, -60, 0, 14),
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextTruncate = Enum.TextTruncate.AtEnd,
+	local PremiumBadge = make("Frame", {
+		Size = UDim2.new(0, 62, 0, 18),
+		Position = UDim2.new(0, 64, 0, 38),
+		BackgroundColor3 = Theme.Accent,
+		BackgroundTransparency = 0.15,
 		Parent = ProfileFooter,
+	})
+	corner(PremiumBadge, 9)
+	make("TextLabel", {
+		Text = "★ Premium",
+		Font = Enum.Font.GothamBold,
+		TextSize = 10,
+		TextColor3 = Theme.Text,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0),
+		TextXAlignment = Enum.TextXAlignment.Center,
+		Parent = PremiumBadge,
 	})
 
 	local ProfileClickCatcher = make("TextButton", {
@@ -561,7 +639,7 @@ function EchoUI:CreateWindow(config)
 		PaddingTop = UDim.new(0, 10),
 		PaddingLeft = UDim.new(0, 8),
 		PaddingRight = UDim.new(0, 8),
-		PaddingBottom = UDim.new(0, 64),
+		PaddingBottom = UDim.new(0, 84),
 		Parent = TabBar,
 	})
 
@@ -614,8 +692,8 @@ function EchoUI:CreateWindow(config)
 	-- Content area (right side)
 	local ContentArea = make("Frame", {
 		Name = "ContentArea",
-		Size = UDim2.new(1, -130, 1, -44),
-		Position = UDim2.new(0, 130, 0, 44),
+		Size = UDim2.new(1, -SidebarWidth, 1, -64),
+		Position = UDim2.new(0, SidebarWidth, 0, 64),
 		BackgroundTransparency = 1,
 		Parent = Main,
 	})
@@ -724,22 +802,24 @@ end
 function EchoUI:CreateTab(name, icon)
 	local TabButton = make("TextButton", {
 		Text = "",
-		BackgroundColor3 = Theme.SurfaceLight,
+		BackgroundColor3 = Theme.Accent,
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, 0, 32),
+		Size = UDim2.new(1, 0, 0, 44),
 		LayoutOrder = #self.Tabs,
 		Parent = self.TabBar,
 	})
-	corner(TabButton, 6)
+	corner(TabButton, 8)
+	local TabButtonStroke = stroke(TabButton, Theme.Accent, 1)
+	TabButtonStroke.Transparency = 1
 
 	local IconImage
-	local labelXOffset = 12
+	local labelXOffset = 14
 	if icon then
 		IconImage = make("ImageLabel", {
 			BackgroundTransparency = 1,
 			ImageColor3 = Theme.SubText,
-			Size = UDim2.new(0, 16, 0, 16),
-			Position = UDim2.new(0, 10, 0.5, -8),
+			Size = UDim2.new(0, 20, 0, 20),
+			Position = UDim2.new(0, 14, 0.5, -10),
 			Parent = TabButton,
 		})
 
@@ -754,13 +834,13 @@ function EchoUI:CreateTab(name, icon)
 			IconImage.Image = icon
 		end
 
-		labelXOffset = 34
+		labelXOffset = 44
 	end
 
 	local TabLabel = make("TextLabel", {
 		Text = name,
-		Font = Enum.Font.Gotham,
-		TextSize = 13,
+		Font = Enum.Font.GothamBold,
+		TextSize = 14,
 		TextColor3 = Theme.SubText,
 		BackgroundTransparency = 1,
 		Position = UDim2.new(0, labelXOffset, 0, 0),
@@ -771,8 +851,8 @@ function EchoUI:CreateTab(name, icon)
 
 	local Page = make("ScrollingFrame", {
 		Name = name .. "Page",
-		Size = UDim2.new(1, -20, 1, -20),
-		Position = UDim2.new(0, 10, 0, 10),
+		Size = UDim2.new(1, -24, 1, -24),
+		Position = UDim2.new(0, 12, 0, 12),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		ScrollBarThickness = 3,
@@ -798,6 +878,7 @@ function EchoUI:CreateTab(name, icon)
 		for _, t in ipairs(self.Tabs) do
 			t.Page.Visible = false
 			tween(t.Button, { BackgroundTransparency = 1 }, 0.15)
+			tween(t.BorderStroke, { Transparency = 1 }, 0.15)
 			tween(t.Label, { TextColor3 = Theme.SubText }, 0.15)
 			if t.Icon then
 				tween(t.Icon, { ImageColor3 = Theme.SubText }, 0.15)
@@ -807,8 +888,9 @@ function EchoUI:CreateTab(name, icon)
 			self.PlaytimePage.Visible = false
 		end
 		Page.Visible = true
-		tween(TabButton, { BackgroundTransparency = 0 }, 0.15)
-		tween(TabLabel, { TextColor3 = Theme.Text }, 0.15)
+		tween(TabButton, { BackgroundTransparency = 0.82 }, 0.15)
+		tween(TabButtonStroke, { Transparency = 0.4 }, 0.15)
+		tween(TabLabel, { TextColor3 = Theme.AccentAlt }, 0.15)
 		if IconImage then
 			tween(IconImage, { ImageColor3 = Theme.AccentAlt }, 0.15)
 		end
@@ -819,6 +901,7 @@ function EchoUI:CreateTab(name, icon)
 
 	Tab.Label = TabLabel
 	Tab.Icon = IconImage
+	Tab.BorderStroke = TabButtonStroke
 
 	table.insert(self.Tabs, Tab)
 	if #self.Tabs == 1 then activate() end
@@ -884,7 +967,7 @@ function EchoUI:CreateTab(name, icon)
 		local Switch = make("Frame", {
 			Size = UDim2.new(0, 38, 0, 20),
 			Position = UDim2.new(1, -48, 0.5, -10),
-			BackgroundColor3 = state and Theme.Accent or Theme.SurfaceLight,
+			BackgroundColor3 = state and Theme.Success or Theme.SurfaceLight,
 			Parent = Holder,
 		})
 		corner(Switch, 10)
@@ -911,7 +994,7 @@ function EchoUI:CreateTab(name, icon)
 
 		local function setState(newState, fire)
 			state = newState
-			tween(Switch, { BackgroundColor3 = state and Theme.Accent or Theme.SurfaceLight }, 0.15)
+			tween(Switch, { BackgroundColor3 = state and Theme.Success or Theme.SurfaceLight }, 0.15)
 			tween(Knob, { Position = state and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8) }, 0.15)
 			if fire ~= false and opts.Callback then
 				local ok, err = pcall(opts.Callback, state)
@@ -1073,7 +1156,7 @@ function EchoUI:CreateTab(name, icon)
 		stroke(SwatchBtn, Theme.Border, 1)
 
 		local Panel = make("Frame", {
-			Size = UDim2.new(1, 0, 0, 110),
+			Size = UDim2.new(1, 0, 0, 76),
 			Position = UDim2.new(0, 0, 1, 4),
 			BackgroundColor3 = Theme.SurfaceLight,
 			Visible = false,
@@ -1101,7 +1184,7 @@ function EchoUI:CreateTab(name, icon)
 
 		local function makeChannelSlider(labelText, initial, yOffset, channelColor, onChange)
 			local Row = make("Frame", {
-				Size = UDim2.new(1, 0, 0, 26),
+				Size = UDim2.new(1, 0, 0, 20),
 				Position = UDim2.new(0, 0, 0, yOffset),
 				BackgroundTransparency = 1,
 				ZIndex = 5,
@@ -1183,19 +1266,19 @@ function EchoUI:CreateTab(name, icon)
 			color = Color3.fromRGB(r, g, b)
 			fireCallback()
 		end)
-		makeChannelSlider("G", g, 32, Color3.fromRGB(90, 255, 120), function(v)
+		makeChannelSlider("G", g, 24, Color3.fromRGB(90, 255, 120), function(v)
 			g = v
 			color = Color3.fromRGB(r, g, b)
 			fireCallback()
 		end)
-		makeChannelSlider("B", b, 64, Color3.fromRGB(100, 140, 255), function(v)
+		makeChannelSlider("B", b, 48, Color3.fromRGB(100, 140, 255), function(v)
 			b = v
 			color = Color3.fromRGB(r, g, b)
 			fireCallback()
 		end)
 
 		local baseHolderSize = Holder.Size
-		local panelHeight = 110
+		local panelHeight = 76
 
 		SwatchBtn.MouseButton1Click:Connect(function()
 			expanded = not expanded
@@ -1234,17 +1317,30 @@ function EchoUI:CreateTab(name, icon)
 		corner(Holder, 6)
 		stroke(Holder, Theme.Border, 1)
 
-		local Label = make("TextButton", {
-			Text = (selected and tostring(selected) or opts.Name or "Select") .. "  ▾",
+		make("TextLabel", {
+			Text = opts.Name or "Select",
 			Font = Enum.Font.Gotham,
 			TextSize = 13,
 			TextColor3 = Theme.Text,
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, -12, 1, 0),
+			Size = UDim2.new(1, -140, 1, 0),
 			Position = UDim2.new(0, 12, 0, 0),
 			TextXAlignment = Enum.TextXAlignment.Left,
 			Parent = Holder,
 		})
+
+		local Label = make("TextButton", {
+			Text = (selected and tostring(selected) or "Default") .. "  ⌄",
+			Font = Enum.Font.GothamBold,
+			TextSize = 13,
+			TextColor3 = Theme.Text,
+			BackgroundColor3 = Theme.SurfaceLight,
+			Size = UDim2.new(0, 110, 0, 26),
+			Position = UDim2.new(1, -122, 0.5, -13),
+			Parent = Holder,
+		})
+		corner(Label, 6)
+		stroke(Label, Theme.Border, 1)
 
 		local ListFrame = make("Frame", {
 			Size = UDim2.new(1, 0, 0, math.min(#options, 5) * 30),
@@ -1300,7 +1396,7 @@ function EchoUI:CreateTab(name, icon)
 			OptBtn.MouseLeave:Connect(function() tween(OptBtn, { BackgroundColor3 = Theme.SurfaceLight }, 0.1) end)
 			OptBtn.MouseButton1Click:Connect(function()
 				selected = opt
-				Label.Text = tostring(opt) .. "  ▾"
+				Label.Text = tostring(opt) .. "  ⌄"
 				open = false
 				ListFrame.Visible = false
 				if opts.Callback then
